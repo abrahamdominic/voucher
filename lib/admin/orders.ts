@@ -36,7 +36,7 @@ export async function queryOrders(filters: OrderFilters): Promise<{
   let query = admin
     .from("orders")
     .select(
-      "*, vouchers(code), plans(name)",
+      "*, vouchers!fk_orders_voucher(code), plans(name)",
       { count: "exact" }
     )
     .order("created_at", { ascending: false })

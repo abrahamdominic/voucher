@@ -15,7 +15,17 @@ export default async function AdminWifiPage() {
   const profile = await requireRole("super_admin");
 
   const admin = createAdminClient();
-  const { data: settings } = await admin.from("wifi_settings").select("*").eq("id", 1).maybeSingle();
+  let { data: settings } = await admin.from("wifi_settings").select("*").eq("id", 1).maybeSingle();
+
+  // Auto-create the singleton row if it doesn't exist yet (table defaults apply).
+  if (!settings) {
+    const { data: inserted } = await admin
+      .from("wifi_settings")
+      .insert({ id: 1 })
+      .select("*")
+      .single();
+    settings = inserted;
+  }
   if (!settings) notFound();
 
   const providerInfo = describeWifiProvider();
